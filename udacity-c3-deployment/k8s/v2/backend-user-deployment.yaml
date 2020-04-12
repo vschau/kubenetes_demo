@@ -3,9 +3,9 @@ kind: Deployment
 metadata:
   labels:
     service: backend-user
-  name: backend-user-v1
+  name: backend-user-v2
 spec:
-  replicas: 2
+  replicas: 1
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -14,12 +14,12 @@ spec:
   selector:
     matchLabels:
       service: backend-user
-      version: v1
+      version: v2
   template:
     metadata:
       labels:
         service: backend-user
-        version: v1
+        version: v2
     spec:
       containers:
       - image: vschau/udacity-restapi-user

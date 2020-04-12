@@ -2,10 +2,10 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    service: reverseproxy
-  name: reverseproxy-v1
+    service: frontend
+  name: frontend-v2
 spec:
-  replicas: 2
+  replicas: 1
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -13,33 +13,35 @@ spec:
       maxUnavailable: 0
   selector:
     matchLabels:
-      service: reverseproxy
-      version: v1
+      service: frontend
+      version: v2
   template:
     metadata:
       labels:
-        service: reverseproxy
-        version: v1
+        service: frontend
+        api: external
+        version: v2   
     spec:
       containers:
-      - image: vschau/reverseproxy
-        name: reverseproxy
+      - image: vschau/udacity-frontend:local
+        name: frontend
         imagePullPolicy: Always          
+        ports:
+        - containerPort: 80
         resources:
           requests:
             memory: "64Mi"
             cpu: "200m"
           limits:
             memory: "512Mi"
-            cpu: "400m"       
-        ports:
-        - containerPort: 8080
+            cpu: "400m"
         readinessProbe:
-          exec:
-            command:
-            - cat
-            - ./etc/nginx/nginx.conf
+          httpGet:
+            path: /
+            port: 80
+            scheme: HTTP
           initialDelaySeconds: 5
           periodSeconds: 10
-          successThreshold: 1  
+          successThreshold: 1
       restartPolicy: Always
+

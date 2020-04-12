@@ -3,16 +3,23 @@ kind: Deployment
 metadata:
   labels:
     service: backend-feed
-  name: backend-feed
+  name: backend-feed-v1
 spec:
   replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
   selector:
     matchLabels:
       service: backend-feed
+      version: v1
   template:
     metadata:
       labels:
         service: backend-feed
+        version: v1
     spec:
       containers:
       - image: vschau/udacity-restapi-feed
@@ -21,10 +28,18 @@ spec:
         resources:
           requests:
             memory: "64Mi"
-            cpu: "250m"
+            cpu: "200m"
           limits:
-            memory: "1024Mi"
-            cpu: "500m"                  
+            memory: "512Mi"
+            cpu: "400m"
+        readinessProbe:
+          exec:
+            command:
+            - cat
+            - ./src/config/config.ts
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          successThreshold: 1  
         env:
         - name: URL
           valueFrom:
@@ -79,4 +94,4 @@ spec:
       volumes:
       - name: aws-secret
         secret:
-          secretName: aws-secret       
+          secretName: aws-secret

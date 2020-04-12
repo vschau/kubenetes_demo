@@ -2,10 +2,10 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    service: backend-user
-  name: backend-user-v1
+    service: backend-feed
+  name: backend-feed-v2
 spec:
-  replicas: 2
+  replicas: 1
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -13,17 +13,17 @@ spec:
       maxUnavailable: 0
   selector:
     matchLabels:
-      service: backend-user
-      version: v1
+      service: backend-feed
+      version: v2
   template:
     metadata:
       labels:
-        service: backend-user
-        version: v1
+        service: backend-feed
+        version: v2
     spec:
       containers:
-      - image: vschau/udacity-restapi-user
-        name: backend-user 
+      - image: vschau/udacity-restapi-feed
+        name: backend-feed
         imagePullPolicy: Always  
         resources:
           requests:
@@ -39,13 +39,28 @@ spec:
             - ./src/config/config.ts
           initialDelaySeconds: 5
           periodSeconds: 10
-          successThreshold: 1   
+          successThreshold: 1  
         env:
         - name: URL
           valueFrom:
             configMapKeyRef:
               name: env-config
-              key: URL 
+              key: URL
+        - name: AWS_BUCKET
+          valueFrom:
+            configMapKeyRef:
+              name: env-config
+              key: AWS_BUCKET
+        - name: AWS_PROFILE
+          valueFrom:
+            configMapKeyRef:
+              name: env-config
+              key: AWS_PROFILE
+        - name: AWS_REGION
+          valueFrom:
+            configMapKeyRef:
+              name: env-config
+              key: AWS_REGION
         - name: JWT_SECRET
           valueFrom:
             configMapKeyRef:
@@ -70,7 +85,13 @@ spec:
           valueFrom:
             secretKeyRef:
               name: env-secret
-              key: POSTGRESS_USERNAME
+              key: POSTGRESS_USERNAME      
+        volumeMounts:
+        - name: aws-secret
+          mountPath: "/root/.aws/"
+          readOnly: true        
       restartPolicy: Always
-
-
+      volumes:
+      - name: aws-secret
+        secret:
+          secretName: aws-secret

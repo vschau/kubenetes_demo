@@ -30,3 +30,11 @@ This web application allows users to log in and upload images to AWS S3 bucket. 
 		`kubectl port-forward service/reverseproxy 8080:8080`
 		`kubectl port-forward service/frontend 8100:8100`
   - In browser, open http://localhost:8100
+- Travis CI
+  - Integrate Github and Travis by following: https://docs.travis-ci.com/user/tutorial/
+  - On Travis CI, create environment variables for Docker Hubs: `DOCKER_PASSWORD`, `DOCKER_USERNAME`
+  - Get base64 string of .kube/config with `cat ${HOME}/.kube/config | base64 | pbcopy`
+  - On Travis CI, create environment variable called `KUBE_CONFIG` with the base64 string from the previous step so that Travis CI can create the config file to be used with kubectl
+- A/B deployment test
+  - run the v2 version of the app with `./udacity-c3-deployment/k8s/v2/deploy.sh`
+  - result is in screenshot: ./screenshots/AB_Testing.jpg.  v1 and v2 of the app are running simultaneously
