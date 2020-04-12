@@ -24,4 +24,8 @@ jobs:
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
         - docker-compose -f udacity-c3-deployment/docker/docker-compose-build.yaml build --parallel 
         - docker-compose -f udacity-c3-deployment/docker/docker-compose-build.yaml push
-      script: bash ./udacity-c3-deployment/k8s/deploy.sh
+      script:
+        - kubectl apply -f udacity-c3-deployment/k8s/backend-feed-deployment.yaml
+        - kubectl apply -f udacity-c3-deployment/k8s/backend-user-deployment.yaml
+        - kubectl apply -f udacity-c3-deployment/k8s/frontend-deployment.yaml
+        - kubectl apply -f udacity-c3-deployment/k8s/reverseproxy-deployment.yaml
